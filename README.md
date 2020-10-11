@@ -1,0 +1,1 @@
+This program simulates how a variety of cache performs on memory traces. With this, we will be able to determine the best overall cache configuration.
