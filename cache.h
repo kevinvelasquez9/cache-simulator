@@ -2,13 +2,13 @@
 CSF Fall 2020
 cache.h */
 
+#include <stdint.h>
 
-
+//You can change the array pointers to vectors if you so please
 typedef struct {
-    uint32_t memAddress;
+    uint32_t tag;
     unsigned char validity;
-    unsigned tag;
-    unsigned offset;
+    unsigned char timestamp;
 
 } Block, *Line;
 
@@ -24,3 +24,21 @@ typedef struct {
     uint16_t offsetWidth;
     uint16_t indexWidth;
 } Cache;
+
+typedef struct {
+    uint64_t accesses;
+    uint64_t reads;
+    uint64_t writes;
+    uint64_t read_misses;
+    uint64_t write_misses;
+
+} Stats, *cacheStats, *cache_stats;
+
+
+
+void print_statistics();
+
+
+
+
+
