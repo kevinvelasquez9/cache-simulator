@@ -2,13 +2,13 @@
 CSF Fall 2020
 cache.h */
 
-#define WRITE_ALLOCATE 1u
-#define NO_WRITE_ALLOCATE 0u
+#define WRITE_ALLOCATE 1
+#define NO_WRITE_ALLOCATE 0
 
-#define WRITE_THROUGH = 2u
+#define WRITE_THROUGH = 2
 #define WRITE_BACK = 0
 
-#define LRU = 4u
+#define LRU = 4
 #define FIFO = 0
 
 #include <stdint.h>
@@ -39,20 +39,29 @@ typedef struct {
 } stats, *cacheStats, *cache_stats;
 
 typedef struct {
-    unsigned tagSize;
-    unsigned offsetSize;
-    Set *sets;
-    uint16_t tagWidth;
-    uint16_t offsetWidth;
-    uint16_t indexWidth;
-    cache_stats *stats;
-    unsigned char accessParams;
-    unsigned associativity;
+    set *sets;
+    uint32_t numSets;
+    uint32_t associativity;
+    uint32_t tagWidth;
+    uint32_t indexWidth;
+    uint32_t offsetWidth;
+    uint32_t bytesPerBlock;
 } cache, *Cache;
 
 void print_statistics();
-
 cache* create_cache(unsigned sets, unsigned blocks, unsigned blockBytes);
+
+uint32_t log2(uint32_t cheeky) {
+    uint32_t result;
+    cheeky = cheeky >> 1;
+    result++
+    if (cheeky == 1) {
+        return result;
+    } else {
+        log2(cheeky);
+    }
+
+}
 
 
 

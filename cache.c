@@ -4,7 +4,7 @@
 #include <vector>
 
 Cache* create_cache(unsigned sets, unsigned blocks, unsigned blockBytes) {
-    asssert(sets >= 1);
+    assert(sets >= 1);
     if (sets > 2) {
         assert(sets % 2 == 0);
     }
@@ -17,10 +17,27 @@ Cache* create_cache(unsigned sets, unsigned blocks, unsigned blockBytes) {
     assert (blockBytes >= 4);
     assert (blockBytes % 2 == 0);
 
+    /*Allocate memory for cache */
     cache *newCache = (cache*)malloc(sizeof(cache));
+    /* Create cache sets */
+    newCache->numSets = sets;
+    newCache->sets = (set*)malloc(sizeof(set) * sets);
+    /* Fill sets with blocks */
     newCache->associativity = blocks;
-    newCache->sets.resize(sets, NULL);
-    newCache->
+    for (int i = 0; i < sets; i++) {
+        newCache->sets[0]->blocks = 
+            (block*)malloc(sizeof(block) * newCache->associativity);
+    }
+    newCache->bytesPerBlock = blockBytes;
+
+    uint32_t totalSize = sets * blocks * blockBytes;
+
+    newCache->offsetWidth = log2(blockBytes);
+    newcache->indexWidth = log2(totalSize) - log2(associativity) - 
+        newCache->offsetWidth;
+    newCache->tagWidth = uint32_t(32) - newCache->offsetWidth - 
+        newCache->indexWidth;
+    
 
 }
 
