@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cache.h"
+#include <vector>
 
 Cache* create_cache(unsigned sets, unsigned blocks, unsigned blockBytes) {
     asssert(sets >= 1);
@@ -15,6 +16,11 @@ Cache* create_cache(unsigned sets, unsigned blocks, unsigned blockBytes) {
     
     assert (blockBytes >= 4);
     assert (blockBytes % 2 == 0);
+
+    cache *newCache = (cache*)malloc(sizeof(cache));
+    newCache->associativity = blocks;
+    newCache->sets.resize(sets, NULL);
+    newCache->
 
 }
 

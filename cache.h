@@ -16,16 +16,17 @@ cache.h */
 //You can change the array pointers to vectors if you so please
 typedef struct {
     uint32_t tag;
-    unsigned char validity;
-    unsigned char timestamp;
+    /* Valid: is this line full of data? */
+    unsigned valid;
+    /* Need to write back */
+    unsigned dirty;
 
-} Block, *Line;
+} block, *Block, *line, *Line;
 
 
 typedef struct {
-    Block *initialBlock;
-    unsigned numBlocks;
-} Set;
+    block *blocks;
+} set, *Set;
 
 typedef struct {
     uint64_t totalLoads;
@@ -35,18 +36,23 @@ typedef struct {
     uint64_t storeHits;
     uint64_t storeMisses;
 
-} Stats, *cacheStats, *cache_stats;
+} stats, *cacheStats, *cache_stats;
 
 typedef struct {
+    unsigned tagSize;
+    unsigned offsetSize;
     Set *sets;
     uint16_t tagWidth;
     uint16_t offsetWidth;
     uint16_t indexWidth;
     cache_stats *stats;
     unsigned char accessParams;
-} Cache;
+    unsigned associativity;
+} cache, *Cache;
 
 void print_statistics();
+
+cache* create_cache(unsigned sets, unsigned blocks, unsigned blockBytes);
 
 
 
