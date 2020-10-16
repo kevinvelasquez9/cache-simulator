@@ -5,15 +5,16 @@
 #include "cache.h"
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
+#include <stdlib.h>
 
 
-paramCheck(int *p, char *arg, int check) {
-    assert(check >= 4 && check < 7)
+int paramCheck(int *p, char *arg, int check) {
+    assert(check >= 4 && check < 7);
     if (check == 4) {
         if (strcmp(arg, "write-allocate")) {
-        
             *p += WRITE_ALLOCATE;
-        } else if (strcmp(arg, "no-write-allocate") {
+        } else if (strcmp(arg, "no-write-allocate")) {
             *p += NO_WRITE_ALLOCATE;
         } else {
             *p = -1;
@@ -23,7 +24,7 @@ paramCheck(int *p, char *arg, int check) {
     if (check == 5) {
         if (strcmp(arg, "write-through")) {
             *p += WRITE_THROUGH;
-        } else if (strcmp(arg, "write-back") {
+        } else if (strcmp(arg, "write-back")) {
             *p += WRITE_BACK;
         } else {
             *p = -1;
@@ -33,18 +34,39 @@ paramCheck(int *p, char *arg, int check) {
     if (check == 6) {
         if (strcmp(arg, "lru")) {
             *p += LRU;
-        } else if (strcmp(arg, "fifo") {
+        } else if (strcmp(arg, "fifo")) {
             *p += FIFO;
         } else {
             *p = -1;
         }
     }
-    
+    return 0;
 }
 
+int read_file() {
+    // Scan the firsrt char to get an 's' or 'l'
+    char instr;
+    scanf(" %c", &instr);
+    if (instr != 's' && instr != 'l') {
+        printf("ERROR: Bad instruction.");
+        return 1;
+    }
 
+    // Scan the second field for the 32-bit address
+    char hex_buf[11];
+    scanf(" %s", hex_buf);
+    uint32_t address = (uint32_t) strtol(hex_buf, NULL, 0);
 
-int main(int argc, char argv[]) {
+    // Scan the rest of the line as junk
+    char junk[4];
+    fgets(junk, 4, stdin);
+
+    // Extract the tag, index, and offset
+
+    return 0;
+}
+
+int main(int argc, char* argv[]) {
     if (argc != 7) {
         return -1;
     }
@@ -60,11 +82,4 @@ int main(int argc, char argv[]) {
         printf("Invalid inputs. Unable to write cache to store\n");
         return -1;
     }
-    
-    
-    
-
-
-
-
 }
