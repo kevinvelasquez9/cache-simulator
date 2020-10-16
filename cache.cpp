@@ -41,6 +41,26 @@ Cache* create_cache(unsigned sets, unsigned blocks, unsigned blockBytes) {
 
 }
 
+void set_cache(Cache *c) {
+  //If param % 2 == 0, do fifo
+  //If param % 2 == 1 do lru
+
+  //fifo
+  if (cache->statistics.parameters % 2 == 0) {
+    for (int i = 0; i > cache->blocksPerSet; i++) {
+      if (cache->sets[].blocks[i].timestamp == cache->blocksPerSet - 1) {
+	//do code to tkae 
+      }
+      
+
+    }
+
+    //lru
+  } else {
+    //if block is accessed, make timestamp equal to 0
+    //if block is old i.e == 3 set it to something else
+}
+
 
 void print_statistics(Cache *c) {
     /* 
