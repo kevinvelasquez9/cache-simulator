@@ -7,6 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <math.h>
 
 
 int paramCheck(int *p, char *arg, int check) {
@@ -43,13 +44,13 @@ int paramCheck(int *p, char *arg, int check) {
     return 0;
 }
 
-int read_file() {
-    // Scan the firsrt char to get an 's' or 'l'
+Scan* read_file(int tagBits, int indexBits, int offsetBits) {
+    // Scan the first char to get an 's' or 'l'
     char instr;
     scanf(" %c", &instr);
     if (instr != 's' && instr != 'l') {
         printf("ERROR: Bad instruction.");
-        return 1;
+        return NULL;
     }
 
     // Scan the second field for the 32-bit address
@@ -62,24 +63,32 @@ int read_file() {
     fgets(junk, 4, stdin);
 
     // Extract the tag, index, and offset
+    uint32_t offset = address & (uint32_t) (pow(2.0, (double) offsetBits) - 1);
+    address = address >> offsetBits;
+    uint32_t index = address & (uint32_t) (pow(2.0, (double) indexBits) - 1);
+    address = address >> indexBits;
+    uint32_t tag = address & (uint32_t) (pow(2.0, (double) tagBits) - 1);
 
-    return 0;
+    // Pass the scanned components
+    Scan components;
+    components.offset = offset;
+    components.index = index;
+    components.tag = tag;
+
+    return &components;
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 7) {
-        return -1;
-    }
-
     assert(argc == 7);
     int param = 0;
     for (int i = 4; i < 7; i++) {
         paramCheck(&param, argv[i], i);
         assert(param >= 0);
     }
-
     if (param < 2) {
         printf("Invalid inputs. Unable to write cache to store\n");
         return -1;
     }
+
+    
 }

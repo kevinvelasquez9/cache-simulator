@@ -2,14 +2,14 @@
 CSF Fall 2020
 cache.h */
 
-#define WRITE_ALLOCATE = 1
-#define NO_WRITE_ALLOCATE = 0
+#define WRITE_ALLOCATE 1
+#define NO_WRITE_ALLOCATE 0
 
-#define WRITE_THROUGH = 2
-#define WRITE_BACK = 0
+#define WRITE_THROUGH 2
+#define WRITE_BACK 0
 
-#define LRU = 4
-#define FIFO = 0
+#define LRU 4
+#define FIFO 0
 
 #include <stdint.h>
 
@@ -63,6 +63,11 @@ uint32_t log2(uint32_t cheeky) {
 
 }
 
+typedef struct {
+    uint32_t offset;
+    uint32_t tag;
+    uint32_t index;
+} Scan;
 
 
 
