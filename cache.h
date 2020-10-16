@@ -2,8 +2,8 @@
 CSF Fall 2020
 cache.h */
 
-#define WRITE_ALLOCATE 1
-#define NO_WRITE_ALLOCATE 0
+#define WRITE_ALLOCATE = 1
+#define NO_WRITE_ALLOCATE = 0
 
 #define WRITE_THROUGH = 2
 #define WRITE_BACK = 0
@@ -54,7 +54,7 @@ cache* create_cache(unsigned sets, unsigned blocks, unsigned blockBytes);
 uint32_t log2(uint32_t cheeky) {
     uint32_t result;
     cheeky = cheeky >> 1;
-    result++
+    result++;
     if (cheeky == 1) {
         return result;
     } else {
