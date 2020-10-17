@@ -85,10 +85,15 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
+    Cache cache;
+    create_cache(uint32_t(atoi(argv[1])), uint32_t(atoi(argv[2])), 
+        uint32_t(atoi(argv[3]), cache);
     
     int indexBits = log(atoi(argv[1]))/log(2);
     int offsetBits = log(atoi(argv[3])) / log(2);
     int tagBits = 32 - indexBits - indexBits;
+
+    
 
     Scan fields;
     int read = 0;

@@ -26,13 +26,13 @@ typedef struct {
     /* Timestamp: For Fifo/LRU ordering */
     unsigned timestamp;
 
-} block, *Block, *line, *Line;
+} Block, *Line;
 
 
 typedef struct {
     /* A vector of blocks with size blocksPerSet */
-    std::vector<block> blocks;
-} set, *Set;
+    std::vector<Block> blocks;
+} Set;
 
 typedef struct {
     uint64_t totalLoads;
@@ -42,11 +42,11 @@ typedef struct {
     uint64_t storeHits;
     uint64_t storeMisses;
 
-} stats, *cacheStats, *cache_stats;
+} Stats;
 
 typedef struct {
     /* A vector of sets */
-    std::vector<set> sets;
+    std::vector<Set> sets;
     /* Params passed in through the command line */
     uint32_t numSets;
     uint32_t blocksPerSet;
@@ -56,8 +56,8 @@ typedef struct {
     uint32_t indexWidth;
     uint32_t offsetWidth;
     /* Cache statisitcs */
-    stats *statistics;
-} cache, *Cache;
+    Stats statistics;
+} Cache;
 
 typedef struct {
     /* Defines load or store instruction */
@@ -69,7 +69,7 @@ typedef struct {
 } Scan;
 
 /* Initializes a new cache */
-cache* create_cache(unsigned sets, unsigned blocks, unsigned blockBytes);
+void create_cache(uint32_t sets, uint32_t blocks, uint32_t blockBytes, cache *newCache);
 void set_cache(Cache *c);
 /* Prints statistics related to successful stores and loads */
 void print_statistics();

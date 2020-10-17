@@ -3,7 +3,7 @@
 #include "cache.h"
 #include <vector>
 
-Cache* create_cache(unsigned sets, unsigned blocks, unsigned blockBytes) {
+void create_cache(uint32_t sets, uint32_t blocks, uint32_t blockBytes, cache *newCache) {
     assert(sets >= 1);
     if (sets > 2) {
         assert(sets % 2 == 0);
@@ -20,21 +20,22 @@ Cache* create_cache(unsigned sets, unsigned blocks, unsigned blockBytes) {
     /*Allocate memory for cache */
     cache *newCache = (cache*)malloc(sizeof(cache));
     /* Create cache sets */
-    newCache->numSets = sets;
     newCache->sets.resize(numSets);
     /* Fill sets with blocks */
-    newCache->blocksPerSet = blocks;
     for (int i = 0; i < sets; i++) {
         newCache->sets[0]->blocks.resize(newCache->blocksPerSet);
     }
+    /* Initialize with values that were passed in */
+    newCache->numSets = sets;
+    newCache->blocksPerSet = blocks;
     newCache->bytesPerBlock = blockBytes;
 
+    /* Infer last parameteres of cache with math */
     newCache->offsetWidth = log2(blockBytes);
     newcache->indexWidth = log2(numSets);
     newCache->tagWidth = uint32_t(MEM_ADDRESS_SIZE) - newCache->offsetWidth - 
         newCache->indexWidth;
     
-
 }
 
 void set_cache(Cache *c) {
