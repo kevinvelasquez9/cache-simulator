@@ -64,6 +64,7 @@ uint32_t log2(uint32_t cheeky) {
 }
 
 typedef struct {
+    char instr;
     uint32_t offset;
     uint32_t tag;
     uint32_t index;

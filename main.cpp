@@ -44,14 +44,14 @@ int paramCheck(int *p, char *arg, int check) {
     return 0;
 }
 
-Scan* read_file(int tagBits, int indexBits, int offsetBits) {
+int read_file(int tagBits, int indexBits, int offsetBits, Scan* cp) {
     // Scan the first char to get an 's' or 'l'
     char instr;
     scanf(" %c", &instr);
     if (instr != 's' && instr != 'l') {
-        printf("ERROR: Bad instruction.");
-        return NULL;
+        return 1;
     }
+    cp->instr = instr;
 
     // Scan the second field for the 32-bit address
     char hex_buf[11];
@@ -63,19 +63,13 @@ Scan* read_file(int tagBits, int indexBits, int offsetBits) {
     fgets(junk, 4, stdin);
 
     // Extract the tag, index, and offset
-    uint32_t offset = address & (uint32_t) (pow(2.0, (double) offsetBits) - 1);
+    cp->offset = address & (uint32_t) (pow(2.0, (double) offsetBits) - 1);
     address = address >> offsetBits;
-    uint32_t index = address & (uint32_t) (pow(2.0, (double) indexBits) - 1);
+    cp->index = address & (uint32_t) (pow(2.0, (double) indexBits) - 1);
     address = address >> indexBits;
-    uint32_t tag = address & (uint32_t) (pow(2.0, (double) tagBits) - 1);
+    cp->tag = address & (uint32_t) (pow(2.0, (double) tagBits) - 1);
 
-    // Pass the scanned components
-    Scan components;
-    components.offset = offset;
-    components.index = index;
-    components.tag = tag;
-
-    return &components;
+    return 0;
 }
 
 int main(int argc, char* argv[]) {
@@ -91,4 +85,14 @@ int main(int argc, char* argv[]) {
     }
 
     
+    int indexBits = atoi(argv[1]);
+    int offsetBits = log(atoi(argv[3])) / log(2);
+    int tagBits = 32 - indexBits - indexBits;
+
+    Scan fields;
+    int read = 0;
+    do {
+        read = read_file(tagBits, indexBits, offsetBits, &fields);
+    } while (read == 0);
+
 }
