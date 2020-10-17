@@ -2,41 +2,40 @@
 #include <stdlib.h>
 #include "cache.h"
 #include <vector>
+#include <assert.h>
 
-void create_cache(uint32_t sets, uint32_t blocks, uint32_t blockBytes, cache *newCache) {
-    assert(sets >= 1);
-    if (sets > 2) {
-        assert(sets % 2 == 0);
-    }
+
+//void create_cache(uint32_t sets, uint32_t blocks, uint32_t blockBytes, Cache* newCache) {
+  //  assert(sets >= 1);
+    //if (sets > 2) {
+      //  assert(sets % 2 == 0);
+    //}
  
-    assert(blocks >= 1);
-    if (blocks > 2) {
-        assert(blocks % 2 == 0);
-    }
+    //assert(blocks >= 1);
+    //if (blocks > 2) {
+      //  assert(blocks % 2 == 0);
+    //}
     
-    assert (blockBytes >= 4);
-    assert (blockBytes % 2 == 0);
+    //assert (blockBytes >= 4);
+    //assert (blockBytes % 2 == 0);
 
-    /*Allocate memory for cache */
-    cache *newCache = (cache*)malloc(sizeof(cache));
     /* Create cache sets */
-    newCache->sets.resize(numSets);
+    //newCache.sets.resize(sets);
     /* Fill sets with blocks */
-    for (int i = 0; i < sets; i++) {
-        newCache->sets[0]->blocks.resize(newCache->blocksPerSet);
-    }
+    //for (int i = 0; i < sets; i++) {
+    //    newCache.sets[0]->blocks.resize(newCache->blocksPerSet);
+    //}
     /* Initialize with values that were passed in */
-    newCache->numSets = sets;
-    newCache->blocksPerSet = blocks;
-    newCache->bytesPerBlock = blockBytes;
+    //newCache->numSets = sets;
+    //newCache->blocksPerSet = blocks;
+    //newCache->bytesPerBlock = blockBytes;
 
     /* Infer last parameteres of cache with math */
-    newCache->offsetWidth = log2(blockBytes);
-    newcache->indexWidth = log2(numSets);
-    newCache->tagWidth = uint32_t(MEM_ADDRESS_SIZE) - newCache->offsetWidth - 
-        newCache->indexWidth;
-    
-}
+    //newCache.offsetWidth = log2(blockBytes);
+    //newCache.indexWidth = log2(numSets);
+    //newCache.tagWidth = uint32_t(MEM_ADDRESS_SIZE) - newCache->offsetWidth - 
+       // newCache->indexWidth;
+//}
 
 void set_cache(Cache *c) {
   //If param % 2 == 0, do fifo

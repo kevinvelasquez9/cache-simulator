@@ -85,9 +85,9 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    Cache cache;
-    create_cache(uint32_t(atoi(argv[1])), uint32_t(atoi(argv[2])), 
-        uint32_t(atoi(argv[3]), cache);
+    //Cache cache;
+    //create_cache((uint32_t) atoi(argv[1]), (uint32_t) atoi(argv[2]), 
+    //  (uint32_t) atoi(argv[3]), &cache);
     
     int indexBits = log(atoi(argv[1]))/log(2);
     int offsetBits = log(atoi(argv[3])) / log(2);
@@ -99,42 +99,37 @@ int main(int argc, char* argv[]) {
     int read = 0;
     do {
         read = read_file(tagBits, indexBits, offsetBits, &fields);
-        if (fields.instr == 'l') {
+        //if (fields.instr == 'l') {
     
-            if (fields.index > cache->numSets - 1 || fields.index < 0) {
-                printf("Invalid trace\n");
-                return -1;
-            }
+          //  if (fields.index > cache.numSets - 1 || fields.index < 0) {
+            //    printf("Invalid trace\n");
+              //  return -1;
+            //}
             
-            cache.statistics->totalLoads += 1;
-            for (int i = 0; i < cache.blocksPerSet; i++) {
-                if (cache.sets[fields.index].blocks[i].tag == fields.tag) {
-                    cache.statistics->loadHits += 1;
-                    break; //breaks from loop. We exit early if tag was pre-loaded
+            //cache.statistics->totalLoads += 1;
+            //for (int i = 0; i < cache.blocksPerSet; i++) {
+              //  if (cache.sets[fields.index].blocks[i].tag == fields.tag) {
+                //    cache.statistics->loadHits += 1;
+                  //  break; //breaks from loop. We exit early if tag was pre-loaded
                            //into cache
-                }
-                if (i == cache.blocksPerSet - 1) {
+                //}
+                //sif (i == cache.blocksPerSet - 1) {
                     /* This means a cacheMiss was registered */
-                    cache.statistics->loadMisses += 1;
+                   // cache.statistics->loadMisses += 1;
 
                     /* We should now load this data from memory into cache */
 
                     //TODO: Code to load data into cache //
                     
-                }
-            }
-        } else if (fields.instr == 's') {
+            //    }
+            //}
+       // } else if (fields.instr == 's') {
 
 
-
-
-
-
-
-        } else {
-            printf("Invalid inputs. Must choose to either load or store\n");
-            return -1;
-        }
+       // } else {
+         //   printf("Invalid inputs. Must choose to either load or store\n");
+           // return -1;
+       // }
     } while (read == 0);
 
 }

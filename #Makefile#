@@ -1,0 +1,10 @@
+#
+# Christian Helgeson and Kevin Velasquez
+# CSF Fall 2020
+# Assignment 3: Cache Simulator
+#
+
+FLAGS = -g -Wall -Wextra --pedantic
+
+csim: main.o cache.o
+	g++ -o $(FLAGS) main.o cache.o

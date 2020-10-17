@@ -69,22 +69,11 @@ typedef struct {
 } Scan;
 
 /* Initializes a new cache */
-void create_cache(uint32_t sets, uint32_t blocks, uint32_t blockBytes, cache *newCache);
-void set_cache(Cache *c);
+//void create_cache(uint32_t sets, uint32_t blocks, uint32_t blockBytes, Cache* newCache);
+//void set_cache(Cache *c);
 /* Prints statistics related to successful stores and loads */
-void print_statistics();
+//void print_statistics();
 
-uint32_t log2(uint32_t cheeky) {
-    uint32_t result;
-    cheeky = cheeky >> 1;
-    result++;
-    if (cheeky == 1) {
-        return result;
-    } else {
-        log2(cheeky);
-    }
-
-}
 
 
 
