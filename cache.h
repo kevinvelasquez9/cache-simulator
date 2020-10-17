@@ -20,6 +20,8 @@ typedef struct {
     unsigned valid;
     /* Need to write back */
     unsigned dirty;
+    /* Timestamp: For Fifo/LRU ordering */
+    unsigned timestamp;
 
 } block, *Block, *line, *Line;
 
