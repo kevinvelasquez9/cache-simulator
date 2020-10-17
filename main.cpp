@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
     }
 
     
-    int indexBits = atoi(argv[1]);
+    int indexBits = log(atoi(argv[1]))/log(2);
     int offsetBits = log(atoi(argv[3])) / log(2);
     int tagBits = 32 - indexBits - indexBits;
 
