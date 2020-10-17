@@ -21,21 +21,17 @@ Cache* create_cache(unsigned sets, unsigned blocks, unsigned blockBytes) {
     cache *newCache = (cache*)malloc(sizeof(cache));
     /* Create cache sets */
     newCache->numSets = sets;
-    newCache->sets = (set*)malloc(sizeof(set) * sets);
+    newCache->sets.resize(numSets);
     /* Fill sets with blocks */
-    newCache->associativity = blocks;
+    newCache->blocksPerSet = blocks;
     for (int i = 0; i < sets; i++) {
-        newCache->sets[0]->blocks = 
-            (block*)malloc(sizeof(block) * newCache->associativity);
+        newCache->sets[0]->blocks.resize(newCache->blocksPerSet);
     }
     newCache->bytesPerBlock = blockBytes;
 
-    uint32_t totalSize = sets * blocks * blockBytes;
-
     newCache->offsetWidth = log2(blockBytes);
-    newcache->indexWidth = log2(totalSize) - log2(associativity) - 
-        newCache->offsetWidth;
-    newCache->tagWidth = uint32_t(32) - newCache->offsetWidth - 
+    newcache->indexWidth = log2(numSets);
+    newCache->tagWidth = uint32_t(MEM_ADDRESS_SIZE) - newCache->offsetWidth - 
         newCache->indexWidth;
     
 
@@ -46,17 +42,17 @@ void set_cache(Cache *c) {
   //If param % 2 == 1 do lru
 
   //fifo
-  if (cache->statistics.parameters % 2 == 0) {
+  /* if (cache->statistics.parameters % 2 == 0) {
     for (int i = 0; i > cache->blocksPerSet; i++) {
       if (cache->sets[].blocks[i].timestamp == cache->blocksPerSet - 1) {
-	//do code to tkae 
-      }
+	//do code to tkae */
+     // }
       
 
-    }
+    //}
 
     //lru
-  } else {
+  //} else {
     //if block is accessed, make timestamp equal to 0
     //if block is old i.e == 3 set it to something else
 }

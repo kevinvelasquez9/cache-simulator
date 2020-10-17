@@ -11,7 +11,10 @@ cache.h */
 #define LRU 4
 #define FIFO 0
 
+#define MEM_ADDRESS_SIZE 32
+
 #include <stdint.h>
+#include <vector>
 
 //You can change the array pointers to vectors if you so please
 typedef struct {
@@ -27,7 +30,8 @@ typedef struct {
 
 
 typedef struct {
-    block *blocks;
+    /* A vector of blocks with size blocksPerSet */
+    std::vector<block> blocks;
 } set, *Set;
 
 typedef struct {
@@ -41,17 +45,34 @@ typedef struct {
 } stats, *cacheStats, *cache_stats;
 
 typedef struct {
-    set *sets;
+    /* A vector of sets */
+    std::vector<set> sets;
+    /* Params passed in through the command line */
     uint32_t numSets;
-    uint32_t associativity;
+    uint32_t blocksPerSet;
+    uint32_t bytesPerBlock;
+    /* Inferred bit widths from parameters */
     uint32_t tagWidth;
     uint32_t indexWidth;
     uint32_t offsetWidth;
-    uint32_t bytesPerBlock;
+    /* Cache statisitcs */
+    stats *statistics;
 } cache, *Cache;
 
-void print_statistics();
+typedef struct {
+    /* Defines load or store instruction */
+    char instr;
+    /* tag | index | offset values */
+    uint32_t tag;
+    uint32_t index;
+    uint32_t offset;
+} Scan;
+
+/* Initializes a new cache */
 cache* create_cache(unsigned sets, unsigned blocks, unsigned blockBytes);
+void set_cache(Cache *c);
+/* Prints statistics related to successful stores and loads */
+void print_statistics();
 
 uint32_t log2(uint32_t cheeky) {
     uint32_t result;
@@ -65,12 +86,7 @@ uint32_t log2(uint32_t cheeky) {
 
 }
 
-typedef struct {
-    char instr;
-    uint32_t offset;
-    uint32_t tag;
-    uint32_t index;
-} Scan;
+
 
 
 
