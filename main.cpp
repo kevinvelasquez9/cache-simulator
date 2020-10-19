@@ -85,8 +85,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    Cache *cache = create_cache((uint32_t) atoi(argv[1]), (uint32_t) atoi(argv[2]), 
-    (uint32_t) atoi(argv[3]));
+    Cache *cache = create_cache((uint32_t)atoi(argv[1]), (uint32_t)atoi(argv[2]), (uint32_t)atoi(argv[3]));
     
     int indexBits = log(atoi(argv[1]))/log(2);
     int offsetBits = log(atoi(argv[3])) / log(2);
@@ -124,18 +123,11 @@ int main(int argc, char* argv[]) {
             //}
        // } else if (fields.instr == 's') {
 
-<<<<<<< HEAD
-        } else {
-            printf("Invalid inputs. Must choose to either load or store\n");
-            return -1;
-        }
-=======
 
        // } else {
          //   printf("Invalid inputs. Must choose to either load or store\n");
            // return -1;
        // }
->>>>>>> 9662f23b2eca1e38d0394c76a80e90ab6ce82c59
     } while (read == 0);
     
     free_cache(cache);

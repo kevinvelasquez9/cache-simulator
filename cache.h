@@ -14,7 +14,6 @@ cache.h */
 #define MEM_ADDRESS_SIZE 32
 
 #include <stdint.h>
-#include <vector>
 
 //You can change the array pointers to vectors if you so please
 typedef struct {
@@ -41,7 +40,7 @@ typedef struct {
     uint64_t loadMisses;
     uint64_t storeHits;
     uint64_t storeMisses;
-
+    uint64_t totalCycles;
 } Stats;
 
 typedef struct {
@@ -68,10 +67,11 @@ typedef struct {
     uint32_t offset;
 } Scan;
 
-Cache create_cache(uint32_t setCounter, uint32_t blocks, uint32_t blockBytes);
+Cache *create_cache(uint32_t setCounter, uint32_t blocks, uint32_t blockBytes);
 void set_cache(Cache *c);
 void print_statistics(Cache *c);
 void free_cache(Cache *c);
+uint32_t easyLog2(uint32_t num);
 
 
 
