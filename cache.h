@@ -31,7 +31,7 @@ typedef struct {
 
 typedef struct {
     /* A vector of blocks with size blocksPerSet */
-    std::vector<Block> blocks;
+    Block *blocks;
 } Set;
 
 typedef struct {
@@ -46,7 +46,7 @@ typedef struct {
 
 typedef struct {
     /* A vector of sets */
-    std::vector<Set> sets;
+    Set *sets;
     /* Params passed in through the command line */
     uint32_t numSets;
     uint32_t blocksPerSet;
@@ -56,7 +56,7 @@ typedef struct {
     uint32_t indexWidth;
     uint32_t offsetWidth;
     /* Cache statisitcs */
-    Stats statistics;
+    Stats *statistics;
 } Cache;
 
 typedef struct {
@@ -68,23 +68,11 @@ typedef struct {
     uint32_t offset;
 } Scan;
 
-/* Initializes a new cache */
-void create_cache(uint32_t sets, uint32_t blocks, uint32_t blockBytes, cache *newCache);
+Cache create_cache(uint32_t setCounter, uint32_t blocks, uint32_t blockBytes);
 void set_cache(Cache *c);
-/* Prints statistics related to successful stores and loads */
-void print_statistics();
+void print_statistics(Cache *c);
+void free_cache(Cache *c);
 
-uint32_t log2(uint32_t cheeky) {
-    uint32_t result;
-    cheeky = cheeky >> 1;
-    result++;
-    if (cheeky == 1) {
-        return result;
-    } else {
-        log2(cheeky);
-    }
-
-}
 
 
 
