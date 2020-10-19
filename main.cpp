@@ -85,9 +85,8 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    //Cache cache;
-    //create_cache((uint32_t) atoi(argv[1]), (uint32_t) atoi(argv[2]), 
-    //  (uint32_t) atoi(argv[3]), &cache);
+    Cache *cache = create_cache((uint32_t) atoi(argv[1]), (uint32_t) atoi(argv[2]), 
+    (uint32_t) atoi(argv[3]));
     
     int indexBits = log(atoi(argv[1]))/log(2);
     int offsetBits = log(atoi(argv[3])) / log(2);
@@ -131,5 +130,6 @@ int main(int argc, char* argv[]) {
            // return -1;
        // }
     } while (read == 0);
-
+    
+    free_cache(cache);
 }
