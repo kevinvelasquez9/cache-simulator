@@ -125,12 +125,6 @@ int main(int argc, char* argv[]) {
             }
         } else if (fields.instr == 's') {
 
-
-
-
-
-
-
         } else {
             printf("Invalid inputs. Must choose to either load or store\n");
             return -1;
