@@ -42,9 +42,6 @@ Cache *create_cache(uint32_t setCounter, uint32_t blocks, uint32_t blockBytes) {
 
 }
 
-void set_cache(Cache *c) {
-    return;
-}
 
 
 void print_statistics(Cache *c) { 
@@ -65,6 +62,16 @@ void free_cache(Cache *c) {
     free(c->sets);
     free(c->statistics);
     free(c);
+}
+
+unsigned return_oldest_block(Set *s, uint32_t bps) {
+    unsigned oldest;
+    for(unsigned i = 0; i < bps; i++) {
+        if (s->blocks[i].timestamp > oldest) {
+            oldest = s->blocks[i].timestamp;
+        }
+    }
+    return oldest;
 }
 
 uint32_t easyLog2(uint32_t num) {

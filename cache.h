@@ -2,18 +2,30 @@
 CSF Fall 2020
 cache.h */
 
-#define WRITE_ALLOCATE 1
+#define WRITE_ALLOCATE 4
 #define NO_WRITE_ALLOCATE 0
 
 #define WRITE_THROUGH 2
 #define WRITE_BACK 0
 
-#define LRU 4
+#define LRU 1
 #define FIFO 0
+
+/* 000: No Write Allocate, Write Back, Fifo
+   001: No Write Allocate, Write Back, LRU
+   010: No Write Allocate, Write Through, Fifo
+   011: No Write Allocate, Write Throguh, LRU
+   100: Write Allocate, Write BAck, FIFO
+   101: Write Allocate, Write Back, LRU
+   110: Write Allocate, Write Through, FIFO
+   111: Write Allocate, Write Through, LRU */
 
 #define MEM_ADDRESS_SIZE 32
 
+
 #include <stdint.h>
+
+
 
 //You can change the array pointers to vectors if you so please
 typedef struct {
@@ -31,6 +43,7 @@ typedef struct {
 typedef struct {
     /* A vector of blocks with size blocksPerSet */
     Block *blocks;
+    unsigned numFilled;
 } Set;
 
 typedef struct {
@@ -68,9 +81,9 @@ typedef struct {
 } Scan;
 
 Cache *create_cache(uint32_t setCounter, uint32_t blocks, uint32_t blockBytes);
-void set_cache(Cache *c);
 void print_statistics(Cache *c);
 void free_cache(Cache *c);
+unsigned return_oldest_block(Set *s, uint32_t bps);
 uint32_t easyLog2(uint32_t num);
 
 
