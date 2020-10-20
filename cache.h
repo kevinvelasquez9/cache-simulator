@@ -22,6 +22,8 @@ cache.h */
 
 #define MEM_ADDRESS_SIZE 32
 
+#define MEM_ACCESS_PER_4 100
+
 
 #include <stdint.h>
 

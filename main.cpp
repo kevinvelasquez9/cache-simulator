@@ -108,6 +108,10 @@ int main(int argc, char* argv[]) {
     //int tagBits = 32 - indexBits - indexBits;
     
     //Scan holds values from each trace line
+
+    uint32_t memAccessCycles = cache->bytesPerBlock >> 2;
+    memAccessCycles = memAccessCycles * MEM_ACCESS_PER_4
+
     Scan fields;
     int read = 0;
     do {
@@ -142,14 +146,13 @@ int main(int argc, char* argv[]) {
                     /* This means a cacheMiss was registered */
                     cache->statistics->loadMisses += 1;
                     /* We should now load this data from memory into cache */
-                    //TODO: Code to load data into cache //
                     /*First check if there are blocks available */
                     if (curSet->numFilled == cache->blocksPerSet) {
                         unsigned swapIdx = return_oldest_block(curSet, cache->blocksPerSet);
                         curSet->blocks[swapIdx].tag = fields.tag;
                         curSet->blocks[swapIdx].valid = 1;
                         if (curSet->blocks[swapIdx].dirty == 1) {
-                           //100 * size of Block/4 
+                           cache->statistics->totalCycles = memCycles;
                         }
                         curSet->blocks[swapIdx].dirty = 0;
                         /* Perhaps perform some code if the evicted block was dirty
