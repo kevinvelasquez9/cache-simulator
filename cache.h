@@ -86,6 +86,7 @@ Cache *create_cache(uint32_t setCounter, uint32_t blocks, uint32_t blockBytes);
 void print_statistics(Cache *c);
 void free_cache(Cache *c);
 unsigned return_oldest_block(Set *s, uint32_t bps);
+void rotate_blocks_left(Block *b, unsigned first);
 uint32_t easyLog2(uint32_t num);
 
 

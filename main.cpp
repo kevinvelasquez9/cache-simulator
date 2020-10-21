@@ -85,7 +85,7 @@ int read_file(int tagBits, int indexBits, int offsetBits, Scan* cp) {
 
 int main(int argc, char* argv[]) {
     //Every time we load or store it's one cycle
-    //MAin memory. Every time you load from memory, i.e load miss, that is 100 cycles
+    //Main memory. Every time you load from memory, i.e load miss, that is 100 cycles
     assert(argc == 7);
     int param = 0;
     //Checks write parameters and exits program if 
@@ -131,9 +131,8 @@ int main(int argc, char* argv[]) {
                     cache->statistics->loadHits += 1;
                     //LRU == 1, LRU set when param is odd
                     if (param % 2 == 1) { 
-                        curSet->blocks[i].timestamp = 0;
-                        //TODO: Update the other timestamps/order
-                    //don't change timestamp for FIFO
+                        //rotate blocks in array so that most recently accessed block is on the right
+                        rotate_blocks_left(curSet->blocks, i);
                     } else {
                         //TODO: Not in this loop, BUT UPDATE timestamps for FIFO linearly
                         //First block timestamp 0, second block 1, etc
@@ -141,40 +140,36 @@ int main(int argc, char* argv[]) {
                     //breaks from loop. we exit early if tag was pre-loaded into cache
                     break;
                 }
-                //TODO: Bring if statement below out of for loop and delete it
-                if (i == cache->blocksPerSet - 1) {
-                    /* This means a cacheMiss was registered */
-                    cache->statistics->loadMisses += 1;
-                    /* We should now load this data from memory into cache */
-                    /*First check if there are blocks available */
-                    if (curSet->numFilled == cache->blocksPerSet) {
-                        unsigned swapIdx = return_oldest_block(curSet, cache->blocksPerSet);
-                        curSet->blocks[swapIdx].tag = fields.tag;
-                        curSet->blocks[swapIdx].valid = 1;
-                        if (curSet->blocks[swapIdx].dirty == 1) {
-                           cache->statistics->totalCycles = memCycles;
-                        }
-                        curSet->blocks[swapIdx].dirty = 0;
-                        /* Perhaps perform some code if the evicted block was dirty
-                        and we need to adjust statistics to register the write */
-                        curSet->blocks[swapIdx].timestamp = 0;
-                    } else {
-                        curSet->blocks[curSet->numFilled].tag == fields.tag;
-                        /*TODO: Maybe check tag validity, though not something we can do */
-                        curSet->blocks[curSet->numFilled].valid = 1;
-                        curSet->numFilled++;
-                    }
-                    /* Add some function within the cache to update timestamps
-                    In blocks. Perhaps consider putting it within the if else statement */
+            }
+            /* This means a cacheMiss was registered */
+            cache->statistics->loadMisses += 1;
+            /* We should now load this data from memory into cache */
+            /* IMPORTANT NOTE: BOTH LRU AND FIFO HAVE OLDEST IN FRONT AND YOUNGEST IN BACK
+            While I undestand that it might make more sense to access the youngest in the
+            front for LRU, this facilitates code reuse and makes my brain feel good */
+            /*First check if blocks are already filled */
+            if (curSet->numFilled == cache->blocksPerSet) {
+                //unsigned swapIdx = return_oldest_block(curSet, cache->blocksPerSet);
+                curSet->blocks[0].tag = fields.tag;
+                curSet->blocks[0].valid = 1;
+                if (curSet->blocks[0].dirty == 1) {
+                    cache->statistics->totalCycles = memCycles;
                 }
+                curSet->blocks[swapIdx].dirty = 0;
+                rotate_blocks_left(curSet->blocks, 0);
+            /* If not put in next available block */
+            } else {
+                curSet->blocks[curSet->numFilled].tag == fields.tag;
+                /*TODO: Maybe check tag validity, though not something we can do */
+                curSet->blocks[curSet->numFilled].valid = 1;
+                curSet->numFilled++;
             }
         //Storing code
         } else if (fields.instr == 's') {
 
 
 
-        } else { 
-                     
+        } else {      
             printf("Invalid inputs. Must choose to either load or store\n");
             return -1;
         }
