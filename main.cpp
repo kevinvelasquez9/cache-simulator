@@ -134,29 +134,30 @@ int main(int argc, char* argv[]) {
                     if (param % 2 == 1) { 
                         //rotate blocks in array so that most recently accessed block is on the right
                         rotate_blocks_left(curSet->blocks, curSet->numFilled, i);
-                    } else {
-                        //TODO: Not in this loop, BUT UPDATE timestamps for FIFO linearly
-                        //First block timestamp 0, second block 1, etc
                     }
                     //breaks from loop. we exit early if tag was pre-loaded into cache
                     break;
                 }
-            }
-            /* Cache Miss registered */
-            cache->statistics->loadMisses += 1;
-            if (curSet->numFilled == cache->blocksPerSet) {
-                printf("TEst\n");
-                curSet->blocks[0].tag = fields.tag;
-                if (curSet->blocks[0].dirty == 1) {
-                    cache->statistics->totalCycles += memAccessCycles;
+                if (i == cache->blocksPerSet - 1) {
+                    /* Load Miss registered */
+                    cache->statistics->loadMisses += 1;
+                    if (curSet->numFilled == cache->blocksPerSet) {
+                        printf("TEst\n");
+                        curSet->blocks[0].tag = fields.tag;
+                        if (curSet->blocks[0].dirty == 1) {
+                            cache->statistics->totalCycles += memAccessCycles;
+                        }
+                        curSet->blocks[0].dirty = 0;
+                        if (param % 2 == 1) {
+                            rotate_blocks_left(curSet->blocks, curSet->numFilled, 0);
+                        }
+                    /* If not put in next available block */
+                    } else {
+                        curSet->blocks[curSet->numFilled].tag = fields.tag;
+                        curSet->numFilled++;
+                    }
                 }
-                curSet->blocks[0].dirty = 0;
-                rotate_blocks_left(curSet->blocks, curSet->numFilled, 0);
-            /* If not put in next available block */
-            } else {
-                curSet->blocks[curSet->numFilled].tag == fields.tag;
-                /*TODO: Maybe check tag validity, though not something we can do */
-                curSet->numFilled++;
+                
             }
         //Storing code
         } else if (fields.instr == 's') {

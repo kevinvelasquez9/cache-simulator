@@ -74,9 +74,9 @@ unsigned return_oldest_block(Set *s, uint32_t bps) {
     return oldest;
 }
 
-void rotate_blocks_left(Block *b, uint32_t numFilled, uint32_t first) {
-    Block temp = b[first];
-    for (unsigned j = first; j < numFilled; j++) {
+void rotate_blocks_left(Block *b, uint32_t numFilled, uint32_t recent) {
+    Block temp = b[recent];
+    for (unsigned j = recent; j < numFilled; j++) {
         b[j] = b[j+1];
     }
     b[numFilled - 1] = temp;
