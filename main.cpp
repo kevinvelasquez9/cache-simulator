@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
             }
         //Storing code
         } else if (fields.instr == 's') {
-            cache->statistics->totalWrites += 1;
+            cache->statistics->totalStores += 1;
             for (int i = 0; i < cache->blocksPerSet; i++) {
                 if (curSet->blocks[i].tag == fields.tag) {
                     cache->statistics->storeHits += 1;
