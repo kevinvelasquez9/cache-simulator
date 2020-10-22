@@ -114,6 +114,7 @@ int main(int argc, char* argv[]) {
 
     Scan fields;
     int read = 0;
+
     do {
         read = read_file(cache->tagWidth, cache->indexWidth, cache->offsetWidth, &fields);
         //Loading code
