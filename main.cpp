@@ -47,14 +47,21 @@ void paramCheck(int *p, char *arg, int check) {
     return;
 }
 
-int read_file(int tagBits, int indexBits, int offsetBits, Scan* cp) {
-    // Scan the first char to get an 's' or 'l'
-    char instr;
+int read_file(int tagBits, int indexBits, int offsetBits, Scan* cp, Cache *c) {
+    /* Scan the first char to get an 's' or 'l'
+    /I set char to 'z' since for some reason instr retains its
+    /value even after we exit scope. */
+    char instr = 'z';
     scanf(" %c", &instr);
     if (instr != 's' && instr != 'l') {
         return 1;
     }
     cp->instr = instr;
+    if (cp->instr == 'l') {
+        c->statistics->totalLoads += 1;
+    } else if (cp->instr == 's') {
+        c->statistics->totalStores += 1;
+    }
 
     // Scan the second field for the 32-bit address
     char hex_buf[11];
@@ -102,21 +109,15 @@ int main(int argc, char* argv[]) {
     }
 
     Cache *cache = create_cache((uint32_t)atoi(argv[1]), (uint32_t)atoi(argv[2]), (uint32_t)atoi(argv[3]));
-    
-    //int indexBits = log(atoi(argv[1]))/log(2);
-    //int offsetBits = log(atoi(argv[3])) / log(2);
-    //int tagBits = 32 - indexBits - indexBits;
-    
-    //Scan holds values from each trace line
 
     uint32_t memAccessCycles = cache->bytesPerBlock >> 2;
     memAccessCycles = memAccessCycles * MEM_ACCESS_PER_4;
 
     Scan fields;
     int read = 0;
-
-    do {
-        read = read_file(cache->tagWidth, cache->indexWidth, cache->offsetWidth, &fields);
+    read = read_file(cache->tagWidth, cache->indexWidth, 
+        cache->offsetWidth, &fields, cache);
+    while (read == 0) {
         //Loading code
         if (fields.instr == 'l') {
             //Exit program if index in trace is invalid
@@ -125,7 +126,6 @@ int main(int argc, char* argv[]) {
                 return -1;
             }
             //We are attempting to load, therefore, our totalLoads increase.
-            cache->statistics->totalLoads += 1;
             Set *curSet = &cache->sets[fields.index];
             for (int i = 0; i < cache->blocksPerSet; i++) {
                 if (curSet->blocks[i].tag == fields.tag) {
@@ -142,15 +142,11 @@ int main(int argc, char* argv[]) {
                     break;
                 }
             }
-            /* This means a cacheMiss was registered */
+            /* Cache Miss registered */
             cache->statistics->loadMisses += 1;
-            /* We should now load this data from memory into cache */
-            /* IMPORTANT NOTE: BOTH LRU AND FIFO HAVE OLDEST IN FRONT AND YOUNGEST IN BACK
-            Not traditional but facilitates code reuse*/
-            /*First check if blocks are already filled */
             if (curSet->numFilled == cache->blocksPerSet) {
+                printf("TEst\n");
                 curSet->blocks[0].tag = fields.tag;
-                curSet->blocks[0].valid = 1;
                 if (curSet->blocks[0].dirty == 1) {
                     cache->statistics->totalCycles += memAccessCycles;
                 }
@@ -160,7 +156,6 @@ int main(int argc, char* argv[]) {
             } else {
                 curSet->blocks[curSet->numFilled].tag == fields.tag;
                 /*TODO: Maybe check tag validity, though not something we can do */
-                curSet->blocks[curSet->numFilled].valid = 1;
                 curSet->numFilled++;
             }
         //Storing code
@@ -172,7 +167,12 @@ int main(int argc, char* argv[]) {
             printf("Invalid inputs. Must choose to either load or store\n");
             return -1;
         }
-    } while (read == 0);
+        
+        read = read_file(cache->tagWidth, cache->indexWidth, 
+            cache->offsetWidth, &fields, cache);
+    } //while (read == 0);
+
+    print_statistics(cache);
     
     free_cache(cache);
 }

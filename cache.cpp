@@ -80,9 +80,6 @@ void rotate_blocks_left(Block *b, uint32_t numFilled, uint32_t first) {
         b[j] = b[j+1];
     }
     b[numFilled - 1] = temp;
-    for (unsigned i = 0; i < numFilled; i++) {
-        printf("%u: %u", i, b[i].tag);
-    }
     
 }
 
