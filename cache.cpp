@@ -64,16 +64,6 @@ void free_cache(Cache *c) {
     free(c);
 }
 
-unsigned return_oldest_block(Set *s, uint32_t bps) {
-    unsigned oldest;
-    for(unsigned i = 0; i < bps; i++) {
-        if (s->blocks[i].timestamp > oldest) {
-            oldest = s->blocks[i].timestamp;
-        }
-    }
-    return oldest;
-}
-
 void rotate_blocks_left(Block *b, uint32_t numFilled, uint32_t recent) {
     Block temp = b[recent];
     for (unsigned j = recent; j < numFilled; j++) {

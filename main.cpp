@@ -118,15 +118,17 @@ int main(int argc, char* argv[]) {
     read = read_file(cache->tagWidth, cache->indexWidth, 
         cache->offsetWidth, &fields, cache);
     while (read == 0) {
+        //Exit program if index in trace is invalid
+        if (fields.index > cache->numSets - 1 || fields.index < 0) {
+            printf("Invalid trace\n");
+            return -1;
+        }
+        //Pointer to set at index. Easier than dereferencing hella structs
+        Set *curSet = &cache->sets[fields.index];
         //Loading code
         if (fields.instr == 'l') {
-            //Exit program if index in trace is invalid
-            if (fields.index > cache->numSets - 1 || fields.index < 0) {
-                printf("Invalid trace\n");
-                return -1;
-            }
             //We are attempting to load, therefore, our totalLoads increase.
-            Set *curSet = &cache->sets[fields.index];
+            cache->statistics->totalLoads += 1;
             for (int i = 0; i < cache->blocksPerSet; i++) {
                 if (curSet->blocks[i].tag == fields.tag) {
                     cache->statistics->loadHits += 1;
@@ -161,9 +163,55 @@ int main(int argc, char* argv[]) {
             }
         //Storing code
         } else if (fields.instr == 's') {
+            cache->statistics->totalWrites += 1;
+            for (int i = 0; i < cache->blocksPerSet; i++) {
+                if (curSet->blocks[i].tag == fields.tag) {
+                    cache->statistics->storeHits += 1;
+                    //Check for write through. Param second bit will be set (010) 
+                    if (param & 2 == 2) {
+                        //Write through will immediately access memory
+                        cache->statistics->totalCycles += memAccessCycles;
+                    } else {
+                        //TODO: Appropriate cycles
+                        //Write back set dirty bit in hit block
+                        curSet->blocks[i].dirty = 1;
+                    }
+                    //LRU == 1, LRU set when param is odd
+                    if (param % 2 == 1) { 
+                        //rotate blocks in array so that most recently accessed block is on the right
+                        rotate_blocks_left(curSet->blocks, curSet->numFilled, i);
+                    }
+                    //breaks from loop. we exit early if tag was pre-loaded into cache
+                    break;
+                }
+                if (i == cache->blocksPerSet - 1) {
+                    /* Load Miss registered */
+                    cache->statistics->storeMisses += 1;
+                    //000 if no write allocate 100 if write allocate
+                    if (param / 4 == 0) {
+                        cache->statistics->totalCycles += memAccessCycles;
+                    } else {
+                        if (curSet->numFilled == cache->blocksPerSet) {
+                            printf("TEst\n");
+                            curSet->blocks[0].tag = fields.tag;
+                            if (curSet->blocks[0].dirty == 1) {
+                                cache->statistics->totalCycles += memAccessCycles;
+                            }
+                            curSet->blocks[0].dirty = 0;
+                            if (param % 2 == 1) {
+                                rotate_blocks_left(curSet->blocks, curSet->numFilled, 0);
+                            }
+                        /* If not put in next available block */
+                        } else {
+                            curSet->blocks[curSet->numFilled].tag = fields.tag;
+                            curSet->numFilled++;
+                        }
 
-
-
+                    }
+                   
+                }
+                
+            }          
         } else {      
             printf("Invalid inputs. Must choose to either load or store\n");
             return -1;
