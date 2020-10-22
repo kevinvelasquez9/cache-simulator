@@ -74,20 +74,20 @@ unsigned return_oldest_block(Set *s, uint32_t bps) {
     return oldest;
 }
 
-void rotate_blocks_left(Block *b, unsigned first) {
+void rotate_blocks_left(Block *b, uint32_t numFilled, uint32_t first) {
     Block temp = b[first];
-    for (unsigned j = first; j < b->numFilled; j++) {
-        b[j] = b[j+1]
+    for (unsigned j = first; j < numFilled; j++) {
+        b[j] = b[j+1];
     }
-    b[b->numFilled - 1] = first;
-    for (unsigned i = 0; i < b->numFilled; i++) {
-        printf("%lu: %lu", i, b[i].tag);
+    b[numFilled - 1] = temp;
+    for (unsigned i = 0; i < numFilled; i++) {
+        printf("%u: %u", i, b[i].tag);
     }
     
 }
 
 uint32_t easyLog2(uint32_t num) {
-    uint32_t result;
+    uint32_t result = 0;
     while (num != 1) {
         result++;
         num = num >> 1;

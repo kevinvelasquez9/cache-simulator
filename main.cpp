@@ -71,7 +71,7 @@ int read_file(int tagBits, int indexBits, int offsetBits, Scan* cp) {
     cp->offset = address & currentMax;
     address = address >> offsetBits;
     
-    temp = 32 - offsetBits;
+    temp = 32 - indexBits;
     currentMax = UINT32_MAX >> temp;
     cp->index = address & currentMax;
     address = address >> indexBits;
@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
     //Scan holds values from each trace line
 
     uint32_t memAccessCycles = cache->bytesPerBlock >> 2;
-    memAccessCycles = memAccessCycles * MEM_ACCESS_PER_4
+    memAccessCycles = memAccessCycles * MEM_ACCESS_PER_4;
 
     Scan fields;
     int read = 0;
@@ -132,7 +132,7 @@ int main(int argc, char* argv[]) {
                     //LRU == 1, LRU set when param is odd
                     if (param % 2 == 1) { 
                         //rotate blocks in array so that most recently accessed block is on the right
-                        rotate_blocks_left(curSet->blocks, i);
+                        rotate_blocks_left(curSet->blocks, curSet->numFilled, i);
                     } else {
                         //TODO: Not in this loop, BUT UPDATE timestamps for FIFO linearly
                         //First block timestamp 0, second block 1, etc
@@ -145,18 +145,16 @@ int main(int argc, char* argv[]) {
             cache->statistics->loadMisses += 1;
             /* We should now load this data from memory into cache */
             /* IMPORTANT NOTE: BOTH LRU AND FIFO HAVE OLDEST IN FRONT AND YOUNGEST IN BACK
-            While I undestand that it might make more sense to access the youngest in the
-            front for LRU, this facilitates code reuse and makes my brain feel good */
+            Not traditional but facilitates code reuse*/
             /*First check if blocks are already filled */
             if (curSet->numFilled == cache->blocksPerSet) {
-                //unsigned swapIdx = return_oldest_block(curSet, cache->blocksPerSet);
                 curSet->blocks[0].tag = fields.tag;
                 curSet->blocks[0].valid = 1;
                 if (curSet->blocks[0].dirty == 1) {
-                    cache->statistics->totalCycles = memCycles;
+                    cache->statistics->totalCycles += memAccessCycles;
                 }
-                curSet->blocks[swapIdx].dirty = 0;
-                rotate_blocks_left(curSet->blocks, 0);
+                curSet->blocks[0].dirty = 0;
+                rotate_blocks_left(curSet->blocks, curSet->numFilled, 0);
             /* If not put in next available block */
             } else {
                 curSet->blocks[curSet->numFilled].tag == fields.tag;

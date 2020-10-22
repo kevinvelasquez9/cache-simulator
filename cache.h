@@ -33,11 +33,11 @@ cache.h */
 typedef struct {
     uint32_t tag;
     /* Valid: is this line full of data? */
-    unsigned valid;
+    uint32_t valid;
     /* Need to write back */
-    unsigned dirty;
+    uint32_t dirty;
     /* Timestamp: For Fifo/LRU ordering */
-    unsigned timestamp;
+    uint32_t timestamp;
 
 } Block, *Line;
 
@@ -45,7 +45,7 @@ typedef struct {
 typedef struct {
     /* A vector of blocks with size blocksPerSet */
     Block *blocks;
-    unsigned numFilled;
+    uint32_t numFilled;
 } Set;
 
 typedef struct {
@@ -86,7 +86,7 @@ Cache *create_cache(uint32_t setCounter, uint32_t blocks, uint32_t blockBytes);
 void print_statistics(Cache *c);
 void free_cache(Cache *c);
 unsigned return_oldest_block(Set *s, uint32_t bps);
-void rotate_blocks_left(Block *b, unsigned first);
+void rotate_blocks_left(Block *b, uint32_t numFilled, uint32_t first);
 uint32_t easyLog2(uint32_t num);
 
 
