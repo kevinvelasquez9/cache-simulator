@@ -178,6 +178,7 @@ int main(int argc, char* argv[]) {
                     //LRU == 1, LRU set when param is odd
                     if (param % 2 == 1) { 
                         //rotate blocks in array so that most recently accessed block is on the right
+                        //and least accessed at index[0]
                         rotate_blocks_left(curSet->blocks, curSet->numFilled, i);
                     }
                     //breaks from loop. we exit early if tag was pre-loaded into cache
