@@ -127,8 +127,6 @@ int main(int argc, char* argv[]) {
         Set *curSet = &cache->sets[fields.index];
         //Loading code
         if (fields.instr == 'l') {
-            //We are attempting to load, therefore, our totalLoads increase.
-            cache->statistics->totalLoads += 1;
             for (int i = 0; i < cache->blocksPerSet; i++) {
                 if (curSet->blocks[i].tag == fields.tag) {
                     cache->statistics->loadHits += 1;
@@ -162,7 +160,6 @@ int main(int argc, char* argv[]) {
             }
         //Storing code
         } else if (fields.instr == 's') {
-            cache->statistics->totalStores += 1;
             for (int i = 0; i < cache->blocksPerSet; i++) {
                 if (curSet->blocks[i].tag == fields.tag) {
                     cache->statistics->storeHits += 1;
