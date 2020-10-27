@@ -26,6 +26,10 @@ Cache *create_cache(uint32_t setCounter, uint32_t blocks, uint32_t blockBytes) {
   /* Fill sets with blocks */
   for (int i = 0; i < setCounter; i++) {
     newCache->sets[i].blocks = (Block*)malloc(sizeof(Block) * blocks);
+    Set *curSet = &newCache->sets[i];
+    for (int j = 0; j < blocks; j++) {
+        curSet->blocks[j].tag = 0xFFFFFFFFFF;
+    }
   }
   /* Initialize with values that were passed in */
   newCache->numSets = setCounter;

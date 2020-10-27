@@ -31,7 +31,7 @@ cache.h */
 
 //You can change the array pointers to vectors if you so please
 typedef struct {
-    uint32_t tag;
+    uint64_t tag;
     /* Need to write back */
     uint32_t dirty;
 
@@ -73,7 +73,7 @@ typedef struct {
     /* Defines load or store instruction */
     char instr;
     /* tag | index | offset values */
-    uint32_t tag;
+    uint64_t tag;
     uint32_t index;
     uint32_t offset;
 } Scan;

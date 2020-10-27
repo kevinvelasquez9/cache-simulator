@@ -70,7 +70,13 @@ int read_file(int tagBits, int indexBits, int offsetBits, Scan* cp, Cache *c) {
 
     // Scan the rest of the line as junk
     char junk[4];
-    fgets(junk, 4, stdin);
+    fgets(junk, 2, stdin);
+    if (getc(stdin) == '\n') {
+        fgets(junk, 1, stdin);
+    } else {
+        fgets(junk, 2, stdin);
+    }
+    
 
     uint32_t temp = 32 - offsetBits;
     uint32_t currentMax = UINT32_MAX >> temp;
@@ -85,7 +91,7 @@ int read_file(int tagBits, int indexBits, int offsetBits, Scan* cp, Cache *c) {
 
     temp = 32 - tagBits;
     currentMax = UINT32_MAX >> temp;
-    cp->tag = address & currentMax;
+    cp->tag = uint64_t(address & currentMax);
 
     return 0;
 }
@@ -110,6 +116,8 @@ int main(int argc, char* argv[]) {
 
     Cache *cache = create_cache((uint32_t)atoi(argv[1]), (uint32_t)atoi(argv[2]), (uint32_t)atoi(argv[3]));
     // here
+
+    //uint32_t memAccessCycles = cache->bytesPerBlock >> 2;
     uint32_t memAccessCycles = 100;
 
     Scan fields;
@@ -127,6 +135,8 @@ int main(int argc, char* argv[]) {
         //Loading code
         if (fields.instr == 'l') {
             for (int i = 0; i < cache->blocksPerSet; i++) {
+                printf("%lu\n", curSet->blocks[i].tag);
+                printf("%lu\n", fields.tag);
                 if (curSet->blocks[i].tag == fields.tag) {
                     cache->statistics->loadHits += 1;
                     cache->statistics->totalCycles += 1;
@@ -138,6 +148,7 @@ int main(int argc, char* argv[]) {
                     //breaks from loop. we exit early if tag was pre-loaded into cache
                     break;
                 }
+
                 if (i == cache->blocksPerSet - 1) {
                     /* Load Miss registered */
                     cache->statistics->loadMisses += 1;
@@ -146,7 +157,7 @@ int main(int argc, char* argv[]) {
                     if (curSet->numFilled == cache->blocksPerSet) {
                         curSet->blocks[0].tag = fields.tag;               
                         if (curSet->blocks[0].dirty == 1) {
-                            cache->statistics->totalCycles += memAccessCycles;
+                            cache->statistics->totalCycles += memAccessCycles; //100
                         }
                         curSet->blocks[0].dirty = 0;
                         if (param % 2 == 1) {
@@ -168,7 +179,7 @@ int main(int argc, char* argv[]) {
                     //Check for write through. Param second bit will be set (010) 
                     if (param & 2 == 2) {
                         //Write through will immediately access memory
-                        cache->statistics->totalCycles += memAccessCycles;
+                        cache->statistics->totalCycles += memAccessCycles; //100
                     } else {
                         //TODO: Appropriate cycles
                         //Write back set dirty bit in hit block
@@ -186,16 +197,15 @@ int main(int argc, char* argv[]) {
                 if (i == cache->blocksPerSet - 1) {
                     /* Store Miss registered */
                     cache->statistics->storeMisses += 1;
-                    cache->statistics->totalCycles += memAccessCycles;
+                    cache->statistics->totalCycles += memAccessCycles; //400
                     //000 if no write allocate 100 if write allocate
                     if (param / 4 == 0) {
-                        cache->statistics->totalCycles += 100;
                     } else {
-                        cache->statistics->totalCycles += memAccessCycles;
+                        cache->statistics->totalCycles += memAccessCycles; //400
                         if (curSet->numFilled == cache->blocksPerSet) {
                             curSet->blocks[0].tag = fields.tag;
                             if (curSet->blocks[0].dirty == 1) {
-                                cache->statistics->totalCycles += memAccessCycles;
+                                cache->statistics->totalCycles += memAccessCycles; //100
                             }
                             curSet->blocks[0].dirty = 0;
                             if (param % 2 == 1) {
