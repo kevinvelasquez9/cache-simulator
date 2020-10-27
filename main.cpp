@@ -109,9 +109,8 @@ int main(int argc, char* argv[]) {
     }
 
     Cache *cache = create_cache((uint32_t)atoi(argv[1]), (uint32_t)atoi(argv[2]), (uint32_t)atoi(argv[3]));
-
-    uint32_t memAccessCycles = cache->bytesPerBlock >> 2;
-    memAccessCycles = memAccessCycles * MEM_ACCESS_PER_4;
+    // here
+    uint32_t memAccessCycles = 100;
 
     Scan fields;
     int read = 0;
@@ -130,6 +129,7 @@ int main(int argc, char* argv[]) {
             for (int i = 0; i < cache->blocksPerSet; i++) {
                 if (curSet->blocks[i].tag == fields.tag) {
                     cache->statistics->loadHits += 1;
+                    cache->statistics->totalCycles += 1;
                     //LRU == 1, LRU set when param is odd
                     if (param % 2 == 1) { 
                         //rotate blocks in array so that most recently accessed block is on the right
@@ -141,8 +141,10 @@ int main(int argc, char* argv[]) {
                 if (i == cache->blocksPerSet - 1) {
                     /* Load Miss registered */
                     cache->statistics->loadMisses += 1;
+                    //here
+                    cache->statistics->totalCycles += 100;
                     if (curSet->numFilled == cache->blocksPerSet) {
-                        curSet->blocks[0].tag = fields.tag;
+                        curSet->blocks[0].tag = fields.tag;               
                         if (curSet->blocks[0].dirty == 1) {
                             cache->statistics->totalCycles += memAccessCycles;
                         }
@@ -187,6 +189,7 @@ int main(int argc, char* argv[]) {
                     cache->statistics->totalCycles += memAccessCycles;
                     //000 if no write allocate 100 if write allocate
                     if (param / 4 == 0) {
+                        cache->statistics->totalCycles += 100;
                     } else {
                         cache->statistics->totalCycles += memAccessCycles;
                         if (curSet->numFilled == cache->blocksPerSet) {
