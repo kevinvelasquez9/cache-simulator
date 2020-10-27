@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
         cache->offsetWidth, &fields, cache);
     while (read == 0) {
         //Exit program if index in trace is invalid
-        if (fields.index > cache->numSets - 1 || fields.index < 0) {
+        if (fields.index > cache->numSets - 1) {
             printf("Invalid trace\n");
             return -1;
         }
@@ -134,9 +134,7 @@ int main(int argc, char* argv[]) {
         Set *curSet = &cache->sets[fields.index];
         //Loading code
         if (fields.instr == 'l') {
-            for (int i = 0; i < cache->blocksPerSet; i++) {
-                printf("%lu\n", curSet->blocks[i].tag);
-                printf("%lu\n", fields.tag);
+            for (uint32_t i = 0; i < cache->blocksPerSet; i++) {
                 if (curSet->blocks[i].tag == fields.tag) {
                     cache->statistics->loadHits += 1;
                     cache->statistics->totalCycles += 1;
@@ -149,7 +147,7 @@ int main(int argc, char* argv[]) {
                     break;
                 }
 
-                if (i == cache->blocksPerSet - 1) {
+                if ((uint32_t) i == cache->blocksPerSet - 1) {
                     /* Load Miss registered */
                     cache->statistics->loadMisses += 1;
                     //here
@@ -173,11 +171,11 @@ int main(int argc, char* argv[]) {
             }
         //Storing code
         } else if (fields.instr == 's') {
-            for (int i = 0; i < cache->blocksPerSet; i++) {
+            for (uint32_t i = 0; i < cache->blocksPerSet; i++) {
                 if (curSet->blocks[i].tag == fields.tag) {
                     cache->statistics->storeHits += 1;
                     //Check for write through. Param second bit will be set (010) 
-                    if (param & 2 == 2) {
+                    if ((param & 2) == 2) {
                         //Write through will immediately access memory
                         cache->statistics->totalCycles += memAccessCycles; //100
                     } else {
@@ -194,7 +192,7 @@ int main(int argc, char* argv[]) {
                     //breaks from loop. we exit early if tag was pre-loaded into cache
                     break;
                 }
-                if (i == cache->blocksPerSet - 1) {
+                if ((uint32_t) i == cache->blocksPerSet - 1) {
                     /* Store Miss registered */
                     cache->statistics->storeMisses += 1;
                     cache->statistics->totalCycles += memAccessCycles; //400
