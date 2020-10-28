@@ -81,7 +81,7 @@ typedef struct {
 Cache *create_cache(uint32_t setCounter, uint32_t blocks, uint32_t blockBytes);
 void print_statistics(Cache *c);
 void free_cache(Cache *c);
-void rotate_blocks_left(Block *b, uint32_t numFilled, uint32_t recent);
+void rotate_blocks_left(uint32_t numBlocks, Block *b, uint32_t numFilled, uint32_t recent);
 uint32_t easyLog2(uint32_t num);
 
 

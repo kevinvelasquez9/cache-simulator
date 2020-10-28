@@ -77,7 +77,7 @@ int read_file(int tagBits, int indexBits, int offsetBits, Scan* cp, Cache *c) {
         fgets(junk, 2, stdin);
     }
     
-
+    /*
     uint32_t temp = 32 - offsetBits;
     uint32_t currentMax = UINT32_MAX >> temp;
     // Extract the tag, index, and offset
@@ -92,6 +92,15 @@ int read_file(int tagBits, int indexBits, int offsetBits, Scan* cp, Cache *c) {
     temp = 32 - tagBits;
     currentMax = UINT32_MAX >> temp;
     cp->tag = uint64_t(address & currentMax);
+    */
+   uint32_t offset = address & (uint32_t) (pow(2.0, (double) offsetBits) - 1);
+   address = address >> offsetBits;
+   uint32_t index = address & (uint32_t) (pow(2.0, (double) indexBits) - 1);
+   address = address >> indexBits;
+   uint32_t tag = address & (uint32_t) (pow(2.0, (double) tagBits) - 1);
+   cp->offset = offset;
+   cp->index = index;
+   cp->tag = tag;
 
     return 0;
 }
@@ -119,7 +128,6 @@ int main(int argc, char* argv[]) {
 
     //uint32_t memAccessCycles = cache->bytesPerBlock >> 2;
     uint32_t memAccessCycles = 100;
-
     Scan fields;
     int read = 0;
     read = read_file(cache->tagWidth, cache->indexWidth, 
@@ -141,7 +149,7 @@ int main(int argc, char* argv[]) {
                     //LRU == 1, LRU set when param is odd
                     if (param % 2 == 1) { 
                         //rotate blocks in array so that most recently accessed block is on the right
-                        rotate_blocks_left(curSet->blocks, curSet->numFilled, i);
+                        rotate_blocks_left(cache->blocksPerSet, curSet->blocks, curSet->numFilled, i);
                     }
                     //breaks from loop. we exit early if tag was pre-loaded into cache
                     break;
@@ -159,7 +167,7 @@ int main(int argc, char* argv[]) {
                         }
                         curSet->blocks[0].dirty = 0;
                         if (param % 2 == 1) {
-                            rotate_blocks_left(curSet->blocks, curSet->numFilled, 0);
+                            rotate_blocks_left(cache->blocksPerSet, curSet->blocks, curSet->numFilled, 0);
                         }
                     /* If not put in next available block */
                     } else {
@@ -187,7 +195,7 @@ int main(int argc, char* argv[]) {
                     if (param % 2 == 1) { 
                         //rotate blocks in array so that most recently accessed block is on the right
                         //and least accessed at index[0]
-                        rotate_blocks_left(curSet->blocks, curSet->numFilled, i);
+                        rotate_blocks_left(cache->blocksPerSet, curSet->blocks, curSet->numFilled, i);
                     }
                     //breaks from loop. we exit early if tag was pre-loaded into cache
                     break;
@@ -207,7 +215,7 @@ int main(int argc, char* argv[]) {
                             }
                             curSet->blocks[0].dirty = 0;
                             if (param % 2 == 1) {
-                                rotate_blocks_left(curSet->blocks, curSet->numFilled, 0);
+                                rotate_blocks_left(cache->blocksPerSet, curSet->blocks, curSet->numFilled, 0);
                             }
                         /* If not put in next available block */
                         } else {

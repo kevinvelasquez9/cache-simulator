@@ -68,7 +68,10 @@ void free_cache(Cache *c) {
     free(c);
 }
 
-void rotate_blocks_left(Block *b, uint32_t numFilled, uint32_t recent) {
+void rotate_blocks_left(uint32_t numBlocks, Block *b, uint32_t numFilled, uint32_t recent) {
+    if (numBlocks <= 1) { 
+        return;
+    }
     Block temp = b[recent];
     for (unsigned j = recent; j < numFilled; j++) {
         b[j] = b[j+1];
