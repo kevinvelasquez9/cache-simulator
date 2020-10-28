@@ -151,7 +151,7 @@ int main(int argc, char* argv[]) {
                     /* Load Miss registered */
                     cache->statistics->loadMisses += 1;
                     //here
-                    cache->statistics->totalCycles += 100;
+                    cache->statistics->totalCycles += 100*cache->bytesPerBlock/4;
                     if (curSet->numFilled == cache->blocksPerSet) {
                         curSet->blocks[0].tag = fields.tag;               
                         if (curSet->blocks[0].dirty == 1) {
@@ -195,7 +195,7 @@ int main(int argc, char* argv[]) {
                 if ((uint32_t) i == cache->blocksPerSet - 1) {
                     /* Store Miss registered */
                     cache->statistics->storeMisses += 1;
-                    cache->statistics->totalCycles += memAccessCycles; //400
+                    cache->statistics->totalCycles += 100; //400
                     //000 if no write allocate 100 if write allocate
                     if (param / 4 == 0) {
                     } else {
