@@ -124,10 +124,15 @@ int main(int argc, char* argv[]) {
     }
 
     Cache *cache = create_cache((uint32_t)atoi(argv[1]), (uint32_t)atoi(argv[2]), (uint32_t)atoi(argv[3]));
-    // here
 
-    //uint32_t memAccessCycles = cache->bytesPerBlock >> 2;
-    uint32_t memAccessCycles = 100;
+    printf("%u %u %u\n", cache->tagWidth, cache->indexWidth, cache->offsetWidth);
+    
+    //Explanation from @Shreya Wadhaw
+    /* 100 * (bytes in block)/4 to load block from memory (write-allocate)
+       100 to write to cache and memory in parallel (write-through) */
+    uint32_t memAccessCycles = cache->bytesPerBlock >> 2;
+    memAccessCycles *= 100;
+
     Scan fields;
     int read = 0;
     read = read_file(cache->tagWidth, cache->indexWidth, 
@@ -158,12 +163,11 @@ int main(int argc, char* argv[]) {
                 if ((uint32_t) i == cache->blocksPerSet - 1) {
                     /* Load Miss registered */
                     cache->statistics->loadMisses += 1;
-                    //here
-                    cache->statistics->totalCycles += 100*cache->bytesPerBlock/4;
+                    cache->statistics->totalCycles += memAccessCycles; //400
                     if (curSet->numFilled == cache->blocksPerSet) {
                         curSet->blocks[0].tag = fields.tag;               
                         if (curSet->blocks[0].dirty == 1) {
-                            cache->statistics->totalCycles += memAccessCycles; //100
+                            cache->statistics->totalCycles += memAccessCycles; //100  //
                         }
                         curSet->blocks[0].dirty = 0;
                         if (param % 2 == 1) {
@@ -183,12 +187,13 @@ int main(int argc, char* argv[]) {
                 if (curSet->blocks[i].tag == fields.tag) {
                     cache->statistics->storeHits += 1;
                     //Check for write through. Param second bit will be set (010) 
-                    if ((param & 2) == 2) {
+                    if ((param & WRITE_THROUGH) == 2) {
                         //Write through will immediately access memory
-                        cache->statistics->totalCycles += memAccessCycles; //100
+                        cache->statistics->totalCycles += 100; //100
                     } else {
                         //TODO: Appropriate cycles
                         //Write back set dirty bit in hit block
+                        cache->statistics->totalCycles += 1;
                         curSet->blocks[i].dirty = 1;
                     }
                     //LRU == 1, LRU set when param is odd
@@ -203,15 +208,16 @@ int main(int argc, char* argv[]) {
                 if ((uint32_t) i == cache->blocksPerSet - 1) {
                     /* Store Miss registered */
                     cache->statistics->storeMisses += 1;
-                    cache->statistics->totalCycles += 100; //400
+                    //cache->statistics->totalCycles += 100; //400
                     //000 if no write allocate 100 if write allocate
-                    if (param / 4 == 0) {
+                    if ((param & WRITE_ALLOCATE) == 0) {
+                        cache->statistics->totalCycles += 100;
                     } else {
                         cache->statistics->totalCycles += memAccessCycles; //400
                         if (curSet->numFilled == cache->blocksPerSet) {
                             curSet->blocks[0].tag = fields.tag;
                             if (curSet->blocks[0].dirty == 1) {
-                                cache->statistics->totalCycles += memAccessCycles; //100
+                                cache->statistics->totalCycles += memAccessCycles; //400
                             }
                             curSet->blocks[0].dirty = 0;
                             if (param % 2 == 1) {
