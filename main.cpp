@@ -8,7 +8,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <math.h>
-
+#include <stdbool.h>
 
 void paramCheck(int *p, char *arg, int check) {
     assert(check >= 4 && check < 7);
@@ -64,9 +64,14 @@ int read_file(int tagBits, int indexBits, int offsetBits, Scan* cp, Cache *c) {
     }
 
     // Scan the second field for the 32-bit address
-    char hex_buf[11];
-    scanf(" %s", hex_buf);
-    uint32_t address = (uint32_t) strtol(hex_buf, NULL, 0);
+    uint32_t address = 0;
+    int numRead = scanf(" %x", &address);
+    if (numRead == 0) {
+        printf("hotdog");
+    }
+    //char hex_buf[11];
+    //scanf(" %s", hex_buf);
+    //uint32_t address = (uint32_t) strtol(hex_buf, NULL, 0);
 
     // Scan the rest of the line as junk
     char junk[4];
@@ -126,6 +131,7 @@ int main(int argc, char* argv[]) {
     Cache *cache = create_cache((uint32_t)atoi(argv[1]), (uint32_t)atoi(argv[2]), (uint32_t)atoi(argv[3]));
 
     printf("%u %u %u\n", cache->tagWidth, cache->indexWidth, cache->offsetWidth);
+    printf("param: %u\n", param);
     
     //Explanation from @Shreya Wadhaw
     /* 100 * (bytes in block)/4 to load block from memory (write-allocate)
@@ -152,34 +158,16 @@ int main(int argc, char* argv[]) {
                     cache->statistics->loadHits += 1;
                     cache->statistics->totalCycles += 1;
                     //LRU == 1, LRU set when param is odd
-                    if (param % 2 == 1) { 
+                    if (param & LRU) { 
                         //rotate blocks in array so that most recently accessed block is on the right
                         rotate_blocks_left(cache->blocksPerSet, curSet->blocks, curSet->numFilled, i);
-                        printf("ROTATEL\n");
                     }
                     //breaks from loop. we exit early if tag was pre-loaded into cache
                     break;
-                }
-
-                if ((uint32_t) i == cache->blocksPerSet - 1) {
+                } else if ((uint32_t) i == cache->blocksPerSet - 1) {
                     /* Load Miss registered */
                     cache->statistics->loadMisses += 1;
-                    cache->statistics->totalCycles += memAccessCycles; //400
-                    if (curSet->numFilled == cache->blocksPerSet) {
-                        curSet->blocks[0].tag = fields.tag;               
-                        if (curSet->blocks[0].dirty == 1) {
-                            cache->statistics->totalCycles += memAccessCycles; //100  //
-                        }
-                        curSet->blocks[0].dirty = 0;
-                        if (param % 2 == 1) {
-                            rotate_blocks_left(cache->blocksPerSet, curSet->blocks, curSet->numFilled, 0);
-                            printf("ROTATEL\n");
-                        }
-                    /* If not put in next available block */
-                    } else {
-                        curSet->blocks[curSet->numFilled].tag = fields.tag;
-                        curSet->numFilled++;
-                    }
+                    insert_new_block(cache, curSet, memAccessCycles, fields, false);
                 }
                 
             }
@@ -189,50 +177,34 @@ int main(int argc, char* argv[]) {
                 if (curSet->blocks[i].tag == fields.tag) {
                     cache->statistics->storeHits += 1;
                     //Check for write through. Param second bit will be set (010) 
-                    if ((param & 2) == 2) {
+                    if (param & WRITE_THROUGH) {
                         //Write through will immediately access memory
                         cache->statistics->totalCycles += 100; //100
                     } else {
-                        //TODO: Appropriate cycles
                         //Write back set dirty bit in hit block
                         cache->statistics->totalCycles += 1;
                         curSet->blocks[i].dirty = 1;
                     }
-                    //LRU == 1, LRU set when param is odd
-                    if (param % 2 == 1) { 
-                        //rotate blocks in array so that most recently accessed block is on the right
-                        //and least accessed at index[0]
-                        rotate_blocks_left(cache->blocksPerSet, curSet->blocks, curSet->numFilled, i);
-                        printf("ROTATES\n");
+                    if (param & LRU) { 
+                        //rotate blocks in array
+                        rotate_blocks_left(cache->blocksPerSet, 
+                            curSet->blocks, curSet->numFilled, i);
                     }
-                    //breaks from loop. we exit early if tag was pre-loaded into cache
                     break;
                 }
                 if ((uint32_t) i == cache->blocksPerSet - 1) {
                     /* Store Miss registered */
                     cache->statistics->storeMisses += 1;
-                    //cache->statistics->totalCycles += 100; //400
-                    //000 if no write allocate 100 if write allocate
-                    if (param / 4 == 0) {
+                    if (!(param & WRITE_ALLOCATE)) {
                         cache->statistics->totalCycles += 100;
                     } else {
-                        cache->statistics->totalCycles += memAccessCycles; //400
-                        if (curSet->numFilled == cache->blocksPerSet) {
-                            curSet->blocks[0].tag = fields.tag;
-                            if (curSet->blocks[0].dirty == 1) {
-                                cache->statistics->totalCycles += memAccessCycles; //400
-                            }
-                            curSet->blocks[0].dirty = 0;
-                            if (param % 2 == 1) {
-                                rotate_blocks_left(cache->blocksPerSet, curSet->blocks, curSet->numFilled, 0);
-                                printf("ROTATES\n");
-                            }
-                        /* If not put in next available block */
+                        bool writeBackBool = false;
+                        if (!(param & WRITE_THROUGH)) {
+                            writeBackBool = true;
                         } else {
-                            curSet->blocks[curSet->numFilled].tag = fields.tag;
-                            curSet->numFilled++;
+                            cache->statistics->totalCycles += 100;
                         }
-
+                        insert_new_block(cache, curSet, memAccessCycles, fields, writeBackBool);
                     }
                    
                 }

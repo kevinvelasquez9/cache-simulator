@@ -2,6 +2,7 @@
 CSF Fall 2020
 cache.h */
 
+
 #define WRITE_ALLOCATE 4
 #define NO_WRITE_ALLOCATE 0
 
@@ -26,6 +27,7 @@ cache.h */
 
 
 #include <stdint.h>
+#include <stdbool.h>
 
 
 
@@ -83,6 +85,7 @@ void print_statistics(Cache *c);
 void free_cache(Cache *c);
 void rotate_blocks_left(uint32_t numBlocks, Block *b, uint32_t numFilled, uint32_t recent);
 uint32_t easyLog2(uint32_t num);
+void insert_new_block(Cache *c, Set *cSet, uint32_t cycles, Scan fields, bool b);
 
 
 

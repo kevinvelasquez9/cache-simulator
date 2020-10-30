@@ -88,3 +88,24 @@ uint32_t easyLog2(uint32_t num) {
     }
     return result;
 }
+
+void insert_new_block(Cache *c, Set *cSet, uint32_t cycles, Scan fields, bool b) {
+    c->statistics->totalCycles += cycles; //400
+    if (cSet->numFilled == c->blocksPerSet) {
+        cSet->blocks[0].tag = fields.tag;
+        if (cSet->blocks[0].dirty == 1) {
+             c->statistics->totalCycles += cycles; //400
+        }
+        if (!b) {
+            cSet->blocks[0].dirty = 0;
+        }
+        rotate_blocks_left(c->blocksPerSet, cSet->blocks, cSet->numFilled, 0);
+
+        /* If not put in next available block */
+    } else {
+        cSet->blocks[cSet->numFilled].tag = fields.tag;
+        cSet->numFilled++;
+    }
+
+
+}
