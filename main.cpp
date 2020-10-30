@@ -155,6 +155,7 @@ int main(int argc, char* argv[]) {
                     if (param % 2 == 1) { 
                         //rotate blocks in array so that most recently accessed block is on the right
                         rotate_blocks_left(cache->blocksPerSet, curSet->blocks, curSet->numFilled, i);
+                        printf("ROTATEL\n");
                     }
                     //breaks from loop. we exit early if tag was pre-loaded into cache
                     break;
@@ -172,6 +173,7 @@ int main(int argc, char* argv[]) {
                         curSet->blocks[0].dirty = 0;
                         if (param % 2 == 1) {
                             rotate_blocks_left(cache->blocksPerSet, curSet->blocks, curSet->numFilled, 0);
+                            printf("ROTATEL\n");
                         }
                     /* If not put in next available block */
                     } else {
@@ -187,7 +189,7 @@ int main(int argc, char* argv[]) {
                 if (curSet->blocks[i].tag == fields.tag) {
                     cache->statistics->storeHits += 1;
                     //Check for write through. Param second bit will be set (010) 
-                    if ((param & WRITE_THROUGH) == 2) {
+                    if ((param & 2) == 2) {
                         //Write through will immediately access memory
                         cache->statistics->totalCycles += 100; //100
                     } else {
@@ -201,6 +203,7 @@ int main(int argc, char* argv[]) {
                         //rotate blocks in array so that most recently accessed block is on the right
                         //and least accessed at index[0]
                         rotate_blocks_left(cache->blocksPerSet, curSet->blocks, curSet->numFilled, i);
+                        printf("ROTATES\n");
                     }
                     //breaks from loop. we exit early if tag was pre-loaded into cache
                     break;
@@ -210,7 +213,7 @@ int main(int argc, char* argv[]) {
                     cache->statistics->storeMisses += 1;
                     //cache->statistics->totalCycles += 100; //400
                     //000 if no write allocate 100 if write allocate
-                    if ((param & WRITE_ALLOCATE) == 0) {
+                    if (param / 4 == 0) {
                         cache->statistics->totalCycles += 100;
                     } else {
                         cache->statistics->totalCycles += memAccessCycles; //400
@@ -222,6 +225,7 @@ int main(int argc, char* argv[]) {
                             curSet->blocks[0].dirty = 0;
                             if (param % 2 == 1) {
                                 rotate_blocks_left(cache->blocksPerSet, curSet->blocks, curSet->numFilled, 0);
+                                printf("ROTATES\n");
                             }
                         /* If not put in next available block */
                         } else {
