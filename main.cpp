@@ -65,10 +65,7 @@ int read_file(int tagBits, int indexBits, int offsetBits, Scan* cp, Cache *c) {
 
     // Scan the second field for the 32-bit address
     uint32_t address = 0;
-    int numRead = scanf(" %x", &address);
-    if (numRead == 0) {
-        printf("hotdog");
-    }
+    scanf(" %x", &address);
     //char hex_buf[11];
     //scanf(" %s", hex_buf);
     //uint32_t address = (uint32_t) strtol(hex_buf, NULL, 0);
@@ -110,6 +107,10 @@ int read_file(int tagBits, int indexBits, int offsetBits, Scan* cp, Cache *c) {
     return 0;
 }
 
+int powerOf2(uint32_t x) {
+    return (x & (x-1)) == 0;
+}
+
 int main(int argc, char* argv[]) {
     //Every time we load or store it's one cycle
     //Main memory. Every time you load from memory, i.e load miss, that is 100 cycles
@@ -127,11 +128,12 @@ int main(int argc, char* argv[]) {
         printf("Invalid inputs. Unable to write cache to store\n");
         return -1;
     }
-
+    
     Cache *cache = create_cache((uint32_t)atoi(argv[1]), (uint32_t)atoi(argv[2]), (uint32_t)atoi(argv[3]));
 
-    printf("%u %u %u\n", cache->tagWidth, cache->indexWidth, cache->offsetWidth);
-    printf("param: %u\n", param);
+    if (powerOf2(cache->numSets) == 0 || powerOf2(cache->blocksPerSet) == 0 || powerOf2(cache->bytesPerBlock) == 0) {
+        return -1;
+    }
     
     //Explanation from @Shreya Wadhaw
     /* 100 * (bytes in block)/4 to load block from memory (write-allocate)
