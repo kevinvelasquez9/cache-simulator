@@ -78,23 +78,7 @@ int read_file(int tagBits, int indexBits, int offsetBits, Scan* cp, Cache *c) {
     } else {
         fgets(junk, 2, stdin);
     }
-    
-    /*
-    uint32_t temp = 32 - offsetBits;
-    uint32_t currentMax = UINT32_MAX >> temp;
-    // Extract the tag, index, and offset
-    cp->offset = address & currentMax;
-    address = address >> offsetBits;
-    
-    temp = 32 - indexBits;
-    currentMax = UINT32_MAX >> temp;
-    cp->index = address & currentMax;
-    address = address >> indexBits;
 
-    temp = 32 - tagBits;
-    currentMax = UINT32_MAX >> temp;
-    cp->tag = uint64_t(address & currentMax);
-    */
    uint32_t offset = address & (uint32_t) (pow(2.0, (double) offsetBits) - 1);
    address = address >> offsetBits;
    uint32_t index = address & (uint32_t) (pow(2.0, (double) indexBits) - 1);
@@ -112,8 +96,6 @@ int powerOf2(uint32_t x) {
 }
 
 int main(int argc, char* argv[]) {
-    //Every time we load or store it's one cycle
-    //Main memory. Every time you load from memory, i.e load miss, that is 100 cycles
     assert(argc == 7);
     int param = 0;
     //Checks write parameters and exits program if 
@@ -156,12 +138,13 @@ int main(int argc, char* argv[]) {
         //Loading code
         if (fields.instr == 'l') {
             for (uint32_t i = 0; i < cache->blocksPerSet; i++) {
+                //Checks if tag was found
                 if (curSet->blocks[i].tag == fields.tag) {
                     cache->statistics->loadHits += 1;
                     cache->statistics->totalCycles += 1;
                     //LRU == 1, LRU set when param is odd
                     if (param & LRU) { 
-                        //rotate blocks in array so that most recently accessed block is on the right
+                        //Rotates array. Block to be evicted at 0. Recent block on right
                         rotate_blocks_left(cache->blocksPerSet, curSet->blocks, curSet->numFilled, i);
                     }
                     //breaks from loop. we exit early if tag was pre-loaded into cache

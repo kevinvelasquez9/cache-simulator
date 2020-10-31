@@ -27,6 +27,8 @@ Cache *create_cache(uint32_t setCounter, uint32_t blocks, uint32_t blockBytes) {
   for (int i = 0; i < setCounter; i++) {
     newCache->sets[i].blocks = (Block*)malloc(sizeof(Block) * blocks);
     Set *curSet = &newCache->sets[i];
+    /* Set tag to number inaccessible by 32 bit address
+       Done in case tag loaded in is 0 */
     for (int j = 0; j < blocks; j++) {
         curSet->blocks[j].tag = 0xFFFFFFFFFF;
     }
@@ -96,6 +98,7 @@ void insert_new_block(Cache *c, Set *cSet, uint32_t cycles, Scan fields, bool b)
         if (cSet->blocks[0].dirty == 1) {
              c->statistics->totalCycles += cycles; //400
         }
+        /* Bool b used to determine whether write back is not set */
         if (!b) {
             cSet->blocks[0].dirty = 0;
         }
